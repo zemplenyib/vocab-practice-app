@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd D:/repos/vocab-practice-app && git add -A && git diff --cached --quiet && exit 0; git diff --cached --name-only | sed 's|.*/||' > /tmp/vc_files.txt; COUNT=$(wc -l < /tmp/vc_files.txt | tr -d ' '); NAMES=$(head -5 /tmp/vc_files.txt | tr '\\n' ',' | sed 's/,$//'); if [ \"$COUNT\" -gt 5 ]; then EXTRA=$((COUNT-5)); NAMES=\"$NAMES (+$EXTRA more)\"; fi; git commit -m \"auto: $NAMES\"",
+            "statusMessage": "Committing changes..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(pnpm install:*)",

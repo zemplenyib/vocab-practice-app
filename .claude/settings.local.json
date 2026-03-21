@@ -1,17 +1,4 @@
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd D:/repos/vocab-practice-app && git add -A && git diff --cached --quiet && exit 0; git diff --cached --name-only | sed 's|.*/||' > /tmp/vc_files.txt; COUNT=$(wc -l < /tmp/vc_files.txt | tr -d ' '); NAMES=$(head -5 /tmp/vc_files.txt | tr '\\n' ',' | sed 's/,$//'); if [ \"$COUNT\" -gt 5 ]; then EXTRA=$((COUNT-5)); NAMES=\"$NAMES (+$EXTRA more)\"; fi; git commit -m \"auto: $NAMES\"",
-            "statusMessage": "Committing changes..."
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(pnpm install:*)",
@@ -26,7 +13,21 @@
       "Bash(curl -s http://localhost:5173/)",
       "Bash(curl -s http://localhost:5173/src/index.css)",
       "Bash(taskkill /PID 36600 /F)",
-      "Bash(taskkill /PID 36712 /F)"
+      "Bash(taskkill /PID 36712 /F)",
+      "Bash(node_modules/.bin/tsx src/seed.ts)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd D:/repos/vocab-practice-app && git add -A && git diff --cached --quiet && exit 0; MSG=$(git diff --cached | claude -p \"Write a single git commit message in conventional commit format (feat, fix, refactor, chore, style, test, docs). Output ONLY the commit message, nothing else. Keep it under 72 chars.\"); git commit -m \"$MSG\"",
+            "statusMessage": "Committing changes..."
+          }
+        ]
+      }
     ]
   }
 }

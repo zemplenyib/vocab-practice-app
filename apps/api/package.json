@@ -1,0 +1,28 @@
+{
+  "name": "@vocab/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.11.1",
+    "@hono/zod-validator": "^0.2.2",
+    "@libsql/client": "^0.6.0",
+    "@vocab/shared": "workspace:*",
+    "drizzle-orm": "^0.30.10",
+    "hono": "^4.3.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "drizzle-kit": "^0.21.4",
+    "tsx": "^4.15.1",
+    "typescript": "^5.4.5"
+  }
+}

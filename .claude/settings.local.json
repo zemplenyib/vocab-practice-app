@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install:*)",
+      "Bash(/c/Users/$USER/AppData/Roaming/npm/pnpm)",
+      "Bash(command -v npm)",
+      "Bash(npm exec:*)",
+      "Bash(\"/d/repos/vocab-practice-app/apps/web/node_modules/.bin/tsc\" --noEmit -p apps/web/tsconfig.json)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(tasklist)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/src/index.css)",
+      "Bash(taskkill /PID 36600 /F)",
+      "Bash(taskkill /PID 36712 /F)"
+    ]
+  }
+}

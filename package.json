@@ -1,0 +1,18 @@
+{
+  "name": "vocab-practice-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @vocab/api dev",
+    "dev:web": "pnpm --filter @vocab/web dev",
+    "build": "pnpm -r build && node -e \"require('fs').cpSync('apps/web/dist', 'apps/api/public', {recursive:true})\"",
+    "db:migrate": "pnpm --filter @vocab/api db:migrate",
+    "db:generate": "pnpm --filter @vocab/api db:generate"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

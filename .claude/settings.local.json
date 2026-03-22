@@ -14,7 +14,8 @@
       "Bash(curl -s http://localhost:5173/src/index.css)",
       "Bash(taskkill /PID 36600 /F)",
       "Bash(taskkill /PID 36712 /F)",
-      "Bash(node_modules/.bin/tsx src/seed.ts)"
+      "Bash(node_modules/.bin/tsx src/seed.ts)",
+      "WebSearch"
     ]
   },
   "hooks": {

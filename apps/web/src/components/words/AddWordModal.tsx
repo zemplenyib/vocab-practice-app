@@ -6,6 +6,12 @@ interface Props {
   onClose: () => void;
 }
 
+const genderColors: Record<'der' | 'die' | 'das', string> = {
+  der: 'var(--new)',
+  die: 'var(--danger)',
+  das: 'var(--learning)',
+};
+
 export default function AddWordModal({ onAdd, onClose }: Props) {
   const [hungarian, setHungarian] = useState('');
   const [german, setGerman] = useState('');
@@ -28,65 +34,89 @@ export default function AddWordModal({ onAdd, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-bold mb-4">Add New Word</h2>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in"
+      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className="w-full max-w-md rounded-xl p-6 animate-fade-up"
+        style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}
+      >
+        <h2 className="font-display text-xl font-semibold mb-5" style={{ color: 'var(--text-primary)' }}>
+          Add word
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {[
+            { label: 'Hungarian', value: hungarian, onChange: setHungarian, focus: true },
+            { label: 'German', value: german, onChange: setGerman, focus: false },
+          ].map(({ label, value, onChange, focus }) => (
+            <div key={label}>
+              <label className="block font-mono text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                {label.toLowerCase()}
+              </label>
+              <input
+                className="w-full rounded-md px-3 py-2.5 font-mono text-sm outline-none transition-colors duration-150"
+                style={{
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
+                }}
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                required
+                autoFocus={focus}
+                onFocus={e => (e.target.style.borderColor = 'var(--gold-dim)')}
+                onBlur={e => (e.target.style.borderColor = 'var(--border)')}
+              />
+            </div>
+          ))}
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hungarian</label>
-            <input
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={hungarian}
-              onChange={e => setHungarian(e.target.value)}
-              required
-              autoFocus
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">German</label>
-            <input
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={german}
-              onChange={e => setGerman(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gender (optional)</label>
+            <label className="block font-mono text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
+              gender <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>(optional)</span>
+            </label>
             <div className="flex gap-2">
-              {(['der', 'die', 'das'] as const).map(g => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setGender(gender === g ? '' : g)}
-                  className={`flex-1 rounded-md px-3 py-2 text-sm font-medium border transition-colors ${
-                    gender === g
-                      ? g === 'der' ? 'bg-blue-500 border-blue-500 text-white'
-                        : g === 'die' ? 'bg-red-500 border-red-500 text-white'
-                        : 'bg-yellow-400 border-yellow-400 text-white'
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {g}
-                </button>
-              ))}
+              {(['der', 'die', 'das'] as const).map(g => {
+                const active = gender === g;
+                const color = genderColors[g];
+                return (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setGender(gender === g ? '' : g)}
+                    className="flex-1 rounded-md py-2 font-mono text-sm font-medium transition-all duration-150"
+                    style={{
+                      background: active ? color : 'var(--bg)',
+                      color: active ? 'var(--bg)' : color,
+                      border: `1px solid ${active ? color : `${color}44`}`,
+                    }}
+                  >
+                    {g}
+                  </button>
+                );
+              })}
             </div>
           </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          <div className="flex gap-3 pt-2">
+
+          {error && <p className="font-mono text-xs" style={{ color: 'var(--danger)' }}>{error}</p>}
+
+          <div className="flex gap-2 pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-50"
+              className="flex-1 rounded-md py-2.5 font-mono text-sm transition-colors duration-150"
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
             >
-              Cancel
+              cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-blue-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 rounded-md py-2.5 font-mono text-sm font-medium transition-all duration-150"
+              style={{ background: 'var(--gold)', color: 'var(--bg)', opacity: submitting ? 0.6 : 1 }}
             >
-              {submitting ? 'Adding...' : 'Add Word'}
+              {submitting ? 'adding...' : 'add word'}
             </button>
           </div>
         </form>

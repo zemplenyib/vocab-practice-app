@@ -1,15 +1,19 @@
 import type { Category } from '@vocab/shared';
 
-const styles: Record<Category, string> = {
-  New: 'bg-blue-100 text-blue-800',
-  Learning: 'bg-yellow-100 text-yellow-800',
-  Mastered: 'bg-green-100 text-green-800',
+const styles: Record<Category, { color: string; bg: string; label: string }> = {
+  New:      { color: 'var(--new)',      bg: 'var(--new-dim)',      label: 'new' },
+  Learning: { color: 'var(--learning)', bg: 'var(--learning-dim)', label: 'learning' },
+  Mastered: { color: 'var(--mastered)', bg: 'var(--mastered-dim)', label: 'mastered' },
 };
 
 export default function WordBadge({ category }: { category: Category }) {
+  const { color, bg, label } = styles[category];
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${styles[category]}`}>
-      {category}
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono font-medium"
+      style={{ color, backgroundColor: bg, border: `1px solid ${color}33` }}
+    >
+      {label}
     </span>
   );
 }

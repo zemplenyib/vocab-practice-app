@@ -11,17 +11,35 @@ export default function PracticePage() {
 
   if (state === 'IDLE') {
     return (
-      <div className="max-w-md mx-auto mt-8">
-        <div className="bg-white rounded-xl border border-gray-200 border-t-4 border-t-indigo-500 shadow-sm p-8 text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
-          <p className="text-gray-500">Test your vocabulary — words are selected by how well you know them.</p>
-          {error && <div className="text-red-600 text-sm">{error}</div>}
+      <div className="max-w-md mx-auto mt-8 animate-fade-up">
+        <div
+          className="rounded-xl p-10 text-center space-y-6"
+          style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}
+        >
+          <div>
+            <h1 className="font-display text-4xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+              Practice
+            </h1>
+            <p className="font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
+              words are weighted by how well you know them
+            </p>
+          </div>
+
+          {error && (
+            <p className="font-mono text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
+          )}
+
           <button
             onClick={fetchNext}
             disabled={loading}
-            className="mt-2 w-full bg-indigo-600 text-white rounded-md px-8 py-4 text-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            className="w-full rounded-md py-4 font-mono text-sm font-semibold transition-all duration-200"
+            style={{
+              background: 'var(--gold)',
+              color: 'var(--bg)',
+              opacity: loading ? 0.6 : 1,
+            }}
           >
-            {loading ? 'Loading...' : 'Start Practice'}
+            {loading ? 'loading...' : 'start practice →'}
           </button>
         </div>
       </div>
@@ -31,9 +49,13 @@ export default function PracticePage() {
   if (!currentWord) return null;
 
   return (
-    <div className="max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Practice</h1>
-      {error && <div className="text-red-600 mb-4">{error}</div>}
+    <div className="max-w-lg mx-auto animate-fade-in">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+          Practice
+        </h1>
+      </div>
+      {error && <div className="font-mono text-xs mb-4" style={{ color: 'var(--danger)' }}>{error}</div>}
       <PracticeCard
         word={currentWord}
         result={result}

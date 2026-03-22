@@ -7,28 +7,46 @@ interface Props {
 }
 
 export default function ResultDisplay({ result, onNext }: Props) {
+  const correct = result.correct;
+  const color = correct ? 'var(--mastered)' : 'var(--danger)';
+  const dim = correct ? 'var(--mastered-dim)' : 'var(--danger-dim)';
+
   return (
-    <div className="space-y-4">
-      <div className={`rounded-lg p-5 text-center border-2 ${result.correct ? 'bg-emerald-50 border-emerald-400' : 'bg-red-50 border-red-400'}`}>
-        <div className={`text-4xl mb-2 ${result.correct ? 'text-emerald-500' : 'text-red-500'}`}>
-          {result.correct ? '✓' : '✗'}
+    <div className="space-y-4 animate-fade-up">
+      <div
+        className="rounded-lg p-6 text-center"
+        style={{ background: dim, border: `1px solid ${color}44` }}
+      >
+        <div className="font-mono text-4xl mb-2" style={{ color }}>
+          {correct ? '✓' : '✗'}
         </div>
-        <div className={`text-2xl font-bold mb-2 ${result.correct ? 'text-emerald-700' : 'text-red-700'}`}>
-          {result.correct ? 'Correct!' : 'Incorrect'}
+        <div className="font-display text-2xl font-semibold mb-3" style={{ color }}>
+          {correct ? 'Correct' : 'Incorrect'}
         </div>
-        <div className="inline-block bg-white rounded-md px-4 py-2 text-gray-700 text-sm font-medium border border-gray-200 mt-1">
-          {result.correctGender ? `${result.correctGender} ` : ''}{result.correctGerman}
+        <div
+          className="inline-block rounded-md px-4 py-2 font-mono text-base"
+          style={{ background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+        >
+          {result.correctGender
+            ? <span style={{ color: result.correctGender === 'der' ? 'var(--new)' : result.correctGender === 'die' ? 'var(--danger)' : 'var(--learning)', marginRight: '0.35rem' }}>{result.correctGender}</span>
+            : null}
+          {result.correctGerman}
         </div>
       </div>
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>New rating: {result.newRating.toFixed(1)}</span>
+
+      <div className="flex items-center justify-between px-1">
+        <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>
+          rating → {result.newRating}
+        </span>
         <WordBadge category={result.category} />
       </div>
+
       <button
         onClick={onNext}
-        className="w-full bg-indigo-600 text-white rounded-md px-4 py-3 font-medium hover:bg-indigo-700 transition-colors"
+        className="w-full rounded-md py-3 font-mono text-sm font-semibold transition-all duration-200"
+        style={{ background: 'var(--gold)', color: 'var(--bg)' }}
       >
-        Next Word
+        next word →
       </button>
     </div>
   );

@@ -12,10 +12,17 @@ interface Props {
 
 export default function PracticeCard({ word, result, loading, onSubmit, onNext }: Props) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 border-t-4 border-t-indigo-500 shadow-sm p-6 space-y-6">
-      <div className="text-center">
-        <div className="text-xs font-medium text-indigo-400 uppercase tracking-wide mb-2">Translate to German</div>
-        <div className="text-4xl font-bold text-gray-900">{word.hungarian}</div>
+    <div
+      className="rounded-xl p-8 space-y-8 animate-fade-up"
+      style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}
+    >
+      <div className="text-center space-y-2">
+        <div className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
+          translate to german
+        </div>
+        <div className="font-display text-5xl font-semibold" style={{ color: 'var(--text-primary)', lineHeight: 1.2 }}>
+          {word.hungarian}
+        </div>
       </div>
 
       {result ? (

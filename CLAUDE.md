@@ -14,6 +14,8 @@ pnpm monorepo with three packages:
 - **Schema lives in shared**: `packages/shared/src/schema.ts` is imported by both the API (Drizzle) and drizzle-kit config. Never duplicate types.
 - **Gender always shown in practice**: To avoid leaking noun/non-noun status, the gender selector is always visible. If `word.gender` is null, gender input is ignored during evaluation.
 - **Word selection**: In-memory circular buffer (last 5 words) in `selectionService.ts`. Recently practiced words get 0.1× weight. Category weights: New=3, Learning=2, Mastered=1.
+- **Edit word**: `PUT /api/words/:id` updates `hungarian`, `german`, `gender` only — preserves `rating`, `createdAt`, `lastPracticedAt`. Frontend uses `EditWordModal` (pencil icon on hover in `WordCard`).
+- **Gender UI**: der/die/das shown as toggle buttons (blue/red/yellow). Click again to deselect. Used in both `AddWordModal` and `EditWordModal`.
 
 ## Common Commands
 
@@ -26,6 +28,9 @@ npm exec pnpm dev:api
 
 # Start frontend dev server (with /api proxy)
 npm exec pnpm dev:web
+
+# Seed database with 50 demo words (skips if DB already has words)
+cd apps/api && node_modules/.bin/tsx src/seed.ts
 
 # Generate new migration after schema changes
 cd apps/api && node_modules/.bin/drizzle-kit generate
@@ -43,7 +48,7 @@ pnpm is not globally installed. Use `npm exec pnpm <command>` or run binaries fr
 
 ## Database
 
-SQLite file: `vocab.db` (repo root, gitignored). Migrations run automatically on API startup via `migrate()` in `apps/api/src/db.ts`.
+SQLite file: `apps/api/vocab.db` (resolved relative to where the API process runs, gitignored). Migrations run automatically on API startup via `migrate()` in `apps/api/src/db.ts`.
 
 ## Rating System
 

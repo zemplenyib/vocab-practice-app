@@ -5,71 +5,85 @@ import AddWordModal from '../components/words/AddWordModal';
 import EditWordModal from '../components/words/EditWordModal';
 import type { AddWordInput, WordWithCategory } from '@vocab/shared';
 
+function StatPill({ count, label, color, dim }: { count: number; label: string; color: string; dim: string }) {
+  return (
+    <div
+      className="flex-1 rounded-lg px-4 py-3 text-center"
+      style={{ background: dim, border: `1px solid ${color}33` }}
+    >
+      <div className="font-mono text-2xl font-semibold" style={{ color }}>{count}</div>
+      <div className="font-mono text-xs mt-0.5" style={{ color: `${color}99` }}>{label}</div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { words, loading, error, addWord, updateWord } = useWords();
   const [showModal, setShowModal] = useState(false);
   const [editingWord, setEditingWord] = useState<WordWithCategory | null>(null);
 
-  const handleAdd = async (input: AddWordInput) => {
-    await addWord(input);
-  };
-
-  const handleUpdate = async (input: AddWordInput) => {
-    if (editingWord) await updateWord(editingWord.id, input);
-  };
+  const handleAdd = async (input: AddWordInput) => { await addWord(input); };
+  const handleUpdate = async (input: AddWordInput) => { if (editingWord) await updateWord(editingWord.id, input); };
 
   const newCount = words.filter(w => w.category === 'New').length;
   const learningCount = words.filter(w => w.category === 'Learning').length;
   const masteredCount = words.filter(w => w.category === 'Mastered').length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Vocabulary ({words.length})
-        </h1>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-end justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+            Vocabulary
+          </h1>
+          <p className="font-mono text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+            {words.length} {words.length === 1 ? 'word' : 'words'}
+          </p>
+        </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-indigo-600 text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-indigo-700 transition-colors"
+          className="font-mono text-sm px-4 py-2 rounded-md transition-all duration-200"
+          style={{
+            background: 'var(--gold-dim)',
+            color: 'var(--gold)',
+            border: '1px solid var(--gold-dim)',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'var(--gold)';
+            e.currentTarget.style.color = 'var(--bg)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'var(--gold-dim)';
+            e.currentTarget.style.color = 'var(--gold)';
+          }}
         >
-          + Add Word
+          + add word
         </button>
       </div>
 
       {!loading && !error && words.length > 0 && (
-        <div className="flex gap-3">
-          <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-center">
-            <div className="text-2xl font-bold text-blue-600">{newCount}</div>
-            <div className="text-xs text-blue-500 font-medium mt-0.5">New</div>
-          </div>
-          <div className="flex-1 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-center">
-            <div className="text-2xl font-bold text-amber-600">{learningCount}</div>
-            <div className="text-xs text-amber-500 font-medium mt-0.5">Learning</div>
-          </div>
-          <div className="flex-1 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3 text-center">
-            <div className="text-2xl font-bold text-emerald-600">{masteredCount}</div>
-            <div className="text-xs text-emerald-500 font-medium mt-0.5">Mastered</div>
-          </div>
+        <div className="flex gap-2">
+          <StatPill count={newCount} label="new" color="var(--new)" dim="var(--new-dim)" />
+          <StatPill count={learningCount} label="learning" color="var(--learning)" dim="var(--learning-dim)" />
+          <StatPill count={masteredCount} label="mastered" color="var(--mastered)" dim="var(--mastered-dim)" />
         </div>
       )}
 
-      {loading && <div className="text-gray-400 text-center py-8">Loading...</div>}
-      {error && <div className="text-red-600 text-center py-8">{error}</div>}
+      {loading && (
+        <div className="font-mono text-sm text-center py-12" style={{ color: 'var(--text-muted)' }}>
+          loading...
+        </div>
+      )}
+      {error && (
+        <div className="font-mono text-sm text-center py-12" style={{ color: 'var(--danger)' }}>
+          {error}
+        </div>
+      )}
       {!loading && !error && <WordList words={words} onEdit={setEditingWord} />}
 
-      {showModal && (
-        <AddWordModal
-          onAdd={handleAdd}
-          onClose={() => setShowModal(false)}
-        />
-      )}
-
+      {showModal && <AddWordModal onAdd={handleAdd} onClose={() => setShowModal(false)} />}
       {editingWord && (
-        <EditWordModal
-          word={editingWord}
-          onUpdate={handleUpdate}
-          onClose={() => setEditingWord(null)}
-        />
+        <EditWordModal word={editingWord} onUpdate={handleUpdate} onClose={() => setEditingWord(null)} />
       )}
     </div>
   );

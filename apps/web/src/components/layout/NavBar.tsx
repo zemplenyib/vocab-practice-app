@@ -3,19 +3,36 @@ import { Link, useLocation } from 'react-router-dom';
 export default function NavBar() {
   const { pathname } = useLocation();
 
-  const linkClass = (path: string) =>
-    `px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-      pathname === path
-        ? 'bg-white text-indigo-700'
-        : 'text-indigo-100 hover:bg-indigo-600'
-    }`;
-
   return (
-    <nav className="bg-indigo-700 shadow-md">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
-        <span className="font-bold text-white mr-4 text-lg">Vocab Practice</span>
-        <Link to="/" className={linkClass('/')}>Words</Link>
-        <Link to="/practice" className={linkClass('/practice')}>Practice</Link>
+    <nav style={{ borderBottom: '1px solid var(--border)' }} className="bg-bg">
+      <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <span className="font-display text-xl text-primary font-semibold tracking-tight">
+          <span style={{ color: 'var(--gold)' }}>V</span>okabular
+        </span>
+        <div className="flex items-center gap-1">
+          {([['/', 'Words'], ['/practice', 'Practice']] as const).map(([path, label]) => {
+            const active = pathname === path;
+            return (
+              <Link
+                key={path}
+                to={path}
+                className="relative px-4 py-1.5 text-sm font-mono transition-colors duration-200"
+                style={{
+                  color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {label}
+                {active && (
+                  <span
+                    className="absolute bottom-0 left-4 right-4 h-px"
+                    style={{ background: 'var(--gold)' }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );

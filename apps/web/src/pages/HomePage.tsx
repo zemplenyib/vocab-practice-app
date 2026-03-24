@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWords } from '../hooks/useWords';
+import { useLists } from '../hooks/useLists';
+import { ListSelector } from '../components/lists/ListSelector';
 import WordList from '../components/words/WordList';
 import AddWordModal from '../components/words/AddWordModal';
 import EditWordModal from '../components/words/EditWordModal';
+import { api } from '../api/client';
 import type { AddWordInput, WordWithCategory } from '@vocab/shared';
 
 function StatPill({ count, label, color, dim }: { count: number; label: string; color: string; dim: string }) {
@@ -18,12 +21,41 @@ function StatPill({ count, label, color, dim }: { count: number; label: string; 
 }
 
 export default function HomePage() {
-  const { words, loading, error, addWord, updateWord } = useWords();
+  const { words, loading, error, refetch: fetchWords, addWord, updateWord, deleteWord, unlinkWord } = useWords();
+  const { lists, fetchLists } = useLists();
   const [showModal, setShowModal] = useState(false);
   const [editingWord, setEditingWord] = useState<WordWithCategory | null>(null);
+  const [activeListId, setActiveListId] = useState<number | null>(null);
 
-  const handleAdd = async (input: AddWordInput) => { await addWord(input); };
-  const handleUpdate = async (input: AddWordInput) => { if (editingWord) await updateWord(editingWord.id, input); };
+  useEffect(() => {
+    fetchLists();
+  }, [fetchLists]);
+
+  useEffect(() => {
+    fetchWords(activeListId ?? undefined);
+  }, [activeListId, fetchWords]);
+
+  const handleAdd = async (input: AddWordInput) => {
+    const newWord = await addWord(input);
+    if (activeListId !== null) {
+      await api.lists.linkWord(activeListId, newWord.id);
+      fetchWords(activeListId);
+    }
+  };
+
+  const handleUpdate = async (input: AddWordInput) => {
+    if (editingWord) await updateWord(editingWord.id, input);
+  };
+
+  const handleDelete = async (word: WordWithCategory) => {
+    if (activeListId === null) {
+      if (!window.confirm(`Permanently delete "${word.hungarian}"?`)) return;
+      await deleteWord(word.id);
+    } else {
+      if (!window.confirm(`Remove "${word.hungarian}" from this list?`)) return;
+      await unlinkWord(activeListId, word.id);
+    }
+  };
 
   const newCount = words.filter(w => w.category === 'New').length;
   const learningCount = words.filter(w => w.category === 'Learning').length;
@@ -61,6 +93,8 @@ export default function HomePage() {
         </button>
       </div>
 
+      <ListSelector lists={lists} activeListId={activeListId} onChange={setActiveListId} />
+
       {!loading && !error && words.length > 0 && (
         <div className="flex gap-2">
           <StatPill count={newCount} label="new" color="var(--new)" dim="var(--new-dim)" />
@@ -79,7 +113,7 @@ export default function HomePage() {
           {error}
         </div>
       )}
-      {!loading && !error && <WordList words={words} onEdit={setEditingWord} />}
+      {!loading && !error && <WordList words={words} onEdit={setEditingWord} onDelete={handleDelete} />}
 
       {showModal && <AddWordModal onAdd={handleAdd} onClose={() => setShowModal(false)} />}
       {editingWord && (

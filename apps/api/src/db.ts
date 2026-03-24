@@ -14,6 +14,9 @@ const url = dbUrl.startsWith('file:') ? dbUrl : `file:${dbUrl}`;
 const client = createClient({ url });
 export const db = drizzle(client, { schema });
 
+// Enable foreign key enforcement (required for ON DELETE CASCADE)
+await client.execute('PRAGMA foreign_keys = ON');
+
 // Run migrations on startup
 const migrationsFolder = join(__dirname, 'migrations');
 await migrate(db, { migrationsFolder });

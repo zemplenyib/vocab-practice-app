@@ -8,6 +8,13 @@
       "when": 1774119829501,
       "tag": "0000_dry_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774360665579,
+      "tag": "0001_clear_justice",
+      "breakpoints": true
     }
   ]
 }

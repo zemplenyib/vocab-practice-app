@@ -1,13 +1,21 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { usePractice } from '../hooks/usePractice';
+import { useLists } from '../hooks/useLists';
+import { ListSelector } from '../components/lists/ListSelector';
 import PracticeCard from '../components/practice/PracticeCard';
 
 export default function PracticePage() {
   const { state, currentWord, result, error, loading, fetchNext, submitAnswer, reset } = usePractice();
+  const { lists, fetchLists } = useLists();
+  const [activeListId, setActiveListId] = useState<number | null>(null);
 
   useEffect(() => {
+    fetchLists();
     return () => reset();
-  }, [reset]);
+  }, [fetchLists, reset]);
+
+  const activeList = activeListId !== null ? lists.find(l => l.id === activeListId) : null;
+  const noWordsInList = activeListId !== null && activeList !== undefined && activeList.wordCount === 0;
 
   if (state === 'IDLE') {
     return (
@@ -25,18 +33,27 @@ export default function PracticePage() {
             </p>
           </div>
 
+          <ListSelector lists={lists} activeListId={activeListId} onChange={setActiveListId} />
+
           {error && (
             <p className="font-mono text-xs" style={{ color: 'var(--danger)' }}>{error}</p>
           )}
 
+          {noWordsInList && (
+            <p className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>
+              No words in this list
+            </p>
+          )}
+
           <button
-            onClick={fetchNext}
-            disabled={loading}
+            onClick={() => fetchNext(activeListId ?? undefined)}
+            disabled={loading || noWordsInList}
             className="w-full rounded-md py-4 font-mono text-sm font-semibold transition-all duration-200"
             style={{
               background: 'var(--gold)',
               color: 'var(--bg)',
-              opacity: loading ? 0.6 : 1,
+              opacity: loading || noWordsInList ? 0.6 : 1,
+              cursor: loading || noWordsInList ? 'not-allowed' : 'pointer',
             }}
           >
             {loading ? 'loading...' : 'start practice →'}
@@ -61,7 +78,7 @@ export default function PracticePage() {
         result={result}
         loading={loading}
         onSubmit={submitAnswer}
-        onNext={fetchNext}
+        onNext={() => fetchNext(activeListId ?? undefined)}
       />
     </div>
   );

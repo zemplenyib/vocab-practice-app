@@ -7,11 +7,11 @@ export function useWords() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchWords = useCallback(async () => {
+  const fetchWords = useCallback(async (listId?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.words.list();
+      const data = await api.words.list(listId);
       setWords(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load words');
@@ -36,5 +36,15 @@ export function useWords() {
     return word;
   }, []);
 
-  return { words, loading, error, refetch: fetchWords, addWord, updateWord };
+  const deleteWord = useCallback(async (id: number) => {
+    await api.words.delete(id);
+    setWords(prev => prev.filter(w => w.id !== id));
+  }, []);
+
+  const unlinkWord = useCallback(async (listId: number, wordId: number) => {
+    await api.lists.unlinkWord(listId, wordId);
+    setWords(prev => prev.filter(w => w.id !== wordId));
+  }, []);
+
+  return { words, loading, error, refetch: fetchWords, addWord, updateWord, deleteWord, unlinkWord };
 }

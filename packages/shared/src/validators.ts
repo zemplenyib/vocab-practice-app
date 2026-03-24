@@ -15,3 +15,13 @@ export const SubmitAnswerSchema = z.object({
 });
 
 export type SubmitAnswerInput = z.infer<typeof SubmitAnswerSchema>;
+
+export const ListNameSchema = z.object({
+  name: z.string().min(1).max(100).transform(s => s.trim()),
+});
+export type ListNameInput = z.infer<typeof ListNameSchema>;
+
+export const ListIdQuerySchema = z.object({
+  listId: z.coerce.number().int().positive().optional(),
+});
+export type ListIdQuery = z.infer<typeof ListIdQuerySchema>;

@@ -11,12 +11,12 @@ export function usePractice() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchNext = useCallback(async () => {
+  const fetchNext = useCallback(async (listId?: number) => {
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const { word } = await api.practice.next();
+      const { word } = await api.practice.next(listId);
       setCurrentWord(word);
       setState('AWAITING_ANSWER');
     } catch (e) {

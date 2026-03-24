@@ -4,9 +4,10 @@ import WordCard from './WordCard';
 interface Props {
   words: WordWithCategory[];
   onEdit?: (word: WordWithCategory) => void;
+  onDelete?: (word: WordWithCategory) => void;
 }
 
-export default function WordList({ words, onEdit }: Props) {
+export default function WordList({ words, onEdit, onDelete }: Props) {
   if (words.length === 0) {
     return (
       <div className="text-center py-16 font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
@@ -22,6 +23,7 @@ export default function WordList({ words, onEdit }: Props) {
           word={word}
           index={i}
           onEdit={onEdit ? () => onEdit(word) : undefined}
+          onDelete={onDelete ? () => onDelete(word) : undefined}
         />
       ))}
     </div>

@@ -1,5 +1,5 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import type { words, practiceSessions } from './schema.js';
+import type { words, practiceSessions, lists } from './schema.js';
 
 export type Word = InferSelectModel<typeof words>;
 export type PracticeSession = InferSelectModel<typeof practiceSessions>;
@@ -16,6 +16,9 @@ export function getCategory(rating: number): Category {
 }
 
 export type WordWithCategory = Word & { category: Category };
+
+export type List = InferSelectModel<typeof lists>;
+export type ListWithCount = List & { wordCount: number };
 
 export type PracticeNextResponse = {
   word: WordWithCategory;

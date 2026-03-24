@@ -1,5 +1,5 @@
 import { db } from '../db.js';
-import { words } from '@vocab/shared';
+import { words, wordLists } from '@vocab/shared';
 import type { AddWordInput, WordWithCategory } from '@vocab/shared';
 import { getCategory } from '@vocab/shared';
 import { eq, desc } from 'drizzle-orm';
@@ -36,4 +36,19 @@ export async function updateWord(id: number, input: AddWordInput): Promise<WordW
     .set({ hungarian: input.hungarian, german: input.german, gender: input.gender ?? null })
     .where(eq(words.id, id));
   return getWordById(id).then(row => row ? { ...row, category: getCategory(row.rating) } : null);
+}
+
+export async function deleteWord(id: number): Promise<boolean> {
+  const result = await db.delete(words).where(eq(words.id, id)).returning();
+  return result.length > 0;
+}
+
+export async function getWordsByListId(listId: number): Promise<WordWithCategory[]> {
+  const rows = await db
+    .select({ words })
+    .from(words)
+    .innerJoin(wordLists, eq(words.id, wordLists.wordId))
+    .where(eq(wordLists.listId, listId))
+    .orderBy(desc(words.createdAt));
+  return rows.map(r => ({ ...r.words, category: getCategory(r.words.rating) }));
 }

@@ -10,7 +10,7 @@ export default function NavBar() {
           <span style={{ color: 'var(--gold)' }}>V</span>okabular
         </span>
         <div className="flex items-center gap-1">
-          {([['/', 'Words'], ['/practice', 'Practice']] as const).map(([path, label]) => {
+          {([['/', 'Words'], ['/lists', 'Lists'], ['/practice', 'Practice']] as const).map(([path, label]) => {
             const active = pathname === path;
             return (
               <Link

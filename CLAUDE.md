@@ -16,6 +16,7 @@ pnpm monorepo with three packages:
 - **Word selection**: In-memory circular buffer (last 5 words) in `selectionService.ts`. Recently practiced words get 0.1× weight. Category weights: New=3, Learning=2, Mastered=1.
 - **Edit word**: `PUT /api/words/:id` updates `hungarian`, `german`, `gender` only — preserves `rating`, `createdAt`, `lastPracticedAt`. Frontend uses `EditWordModal` (pencil icon on hover in `WordCard`).
 - **Gender UI**: der/die/das shown as toggle buttons (blue/red/yellow). Click again to deselect. Used in both `AddWordModal` and `EditWordModal`.
+- **Word Lists**: Words can belong to multiple lists via a many-to-many `word_lists` join table. "Alle Wörter" is a virtual sentinel (no DB row) that always resolves to all words. Delete on "Alle Wörter" removes the word permanently; delete on a specific list unlinks the word from that list only. Foreign keys enabled via `PRAGMA foreign_keys = ON` in `db.ts` to ensure cascade deletes work correctly. New words added while a specific list is selected are automatically linked to that list.
 
 ## Common Commands
 

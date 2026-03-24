@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 export const words = sqliteTable('words', {
@@ -17,3 +17,16 @@ export const practiceSessions = sqliteTable('practice_sessions', {
   wasCorrect: integer('was_correct', { mode: 'boolean' }).notNull(),
   practicedAt: integer('practiced_at').notNull().default(sql`(unixepoch())`),
 });
+
+export const lists = sqliteTable('lists', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(),
+  createdAt: integer('created_at').notNull().default(sql`(unixepoch())`),
+});
+
+export const wordLists = sqliteTable('word_lists', {
+  wordId: integer('word_id').notNull().references(() => words.id, { onDelete: 'cascade' }),
+  listId: integer('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.wordId, table.listId] }),
+}));

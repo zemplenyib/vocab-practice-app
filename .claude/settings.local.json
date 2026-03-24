@@ -17,18 +17,5 @@
       "Bash(node_modules/.bin/tsx src/seed.ts)",
       "WebSearch"
     ]
-  },
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "cd D:/repos/vocab-practice-app && git add -A && git diff --cached --quiet && exit 0; MSG=$(git diff --cached | claude -p \"Write a single git commit message in conventional commit format (feat, fix, refactor, chore, style, test, docs). Output ONLY the commit message, nothing else. Keep it under 72 chars.\"); git commit -m \"$MSG\"",
-            "statusMessage": "Committing changes..."
-          }
-        ]
-      }
-    ]
   }
 }

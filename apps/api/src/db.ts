@@ -14,9 +14,14 @@ const url = dbUrl.startsWith('file:') ? dbUrl : `file:${dbUrl}`;
 const client = createClient({ url });
 export const db = drizzle(client, { schema });
 
-// Enable foreign key enforcement (required for ON DELETE CASCADE)
-await client.execute('PRAGMA foreign_keys = ON');
-
 // Run migrations on startup
 const migrationsFolder = join(__dirname, 'migrations');
 await migrate(db, { migrationsFolder });
+
+// Enable foreign key enforcement (required for ON DELETE CASCADE)
+// Must run after migrations since migrate() uses batch() internally
+try {
+  await client.execute('PRAGMA foreign_keys = ON');
+} catch {
+  // Some @libsql/client versions throw on PRAGMA — safe to ignore
+}

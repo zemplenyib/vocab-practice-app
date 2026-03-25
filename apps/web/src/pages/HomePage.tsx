@@ -5,20 +5,9 @@ import { ListSelector } from '../components/lists/ListSelector';
 import WordList from '../components/words/WordList';
 import AddWordModal from '../components/words/AddWordModal';
 import EditWordModal from '../components/words/EditWordModal';
+import StatPills from '../components/words/StatPills';
 import { api } from '../api/client';
 import type { AddWordInput, WordWithCategory } from '@vocab/shared';
-
-function StatPill({ count, label, color, dim }: { count: number; label: string; color: string; dim: string }) {
-  return (
-    <div
-      className="flex-1 rounded-lg px-4 py-3 text-center"
-      style={{ background: dim, border: `1px solid ${color}33` }}
-    >
-      <div className="font-mono text-2xl font-semibold" style={{ color }}>{count}</div>
-      <div className="font-mono text-xs mt-0.5" style={{ color: `${color}99` }}>{label}</div>
-    </div>
-  );
-}
 
 export default function HomePage() {
   const { words, loading, error, refetch: fetchWords, addWord, updateWord, deleteWord, unlinkWord } = useWords();
@@ -57,10 +46,6 @@ export default function HomePage() {
     }
   };
 
-  const newCount = words.filter(w => w.category === 'New').length;
-  const learningCount = words.filter(w => w.category === 'Learning').length;
-  const masteredCount = words.filter(w => w.category === 'Mastered').length;
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-end justify-between">
@@ -95,13 +80,7 @@ export default function HomePage() {
 
       <ListSelector lists={lists} activeListId={activeListId} onChange={setActiveListId} />
 
-      {!loading && !error && words.length > 0 && (
-        <div className="flex gap-2">
-          <StatPill count={newCount} label="new" color="var(--new)" dim="var(--new-dim)" />
-          <StatPill count={learningCount} label="learning" color="var(--learning)" dim="var(--learning-dim)" />
-          <StatPill count={masteredCount} label="mastered" color="var(--mastered)" dim="var(--mastered-dim)" />
-        </div>
-      )}
+      {!loading && !error && words.length > 0 && <StatPills words={words} />}
 
       {loading && (
         <div className="font-mono text-sm text-center py-12" style={{ color: 'var(--text-muted)' }}>

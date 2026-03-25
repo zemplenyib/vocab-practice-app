@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLists } from '../hooks/useLists';
 import { api } from '../api/client';
 
@@ -26,12 +27,13 @@ function TrashIcon() {
 interface ListRowProps {
   name: string;
   wordCount: number;
+  href?: string;
   editable?: boolean;
   onRename?: (name: string) => Promise<string | null>;
   onDelete?: () => void;
 }
 
-function ListRow({ name, wordCount, editable = true, onRename, onDelete }: ListRowProps) {
+function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }: ListRowProps) {
   const [hovered, setHovered] = useState(false);
   const [renaming, setRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState(name);
@@ -57,9 +59,67 @@ function ListRow({ name, wordCount, editable = true, onRename, onDelete }: ListR
     setRenameError(null);
   };
 
+  const nameContent = renaming ? (
+    <div className="flex items-center gap-2 flex-1">
+      <input
+        autoFocus
+        value={renameValue}
+        onChange={e => setRenameValue(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') handleRenameConfirm();
+          if (e.key === 'Escape') handleRenameCancel();
+        }}
+        className="font-mono text-base flex-1 min-w-0 rounded px-2 py-0.5"
+        style={{
+          background: 'var(--bg)',
+          border: '1px solid var(--border-accent)',
+          color: 'var(--text-primary)',
+          outline: 'none',
+        }}
+      />
+      <button
+        onClick={handleRenameConfirm}
+        disabled={saving || !renameValue.trim()}
+        className="font-mono text-xs px-3 py-1 rounded"
+        style={{
+          background: 'var(--gold)',
+          color: 'var(--bg)',
+          opacity: saving || !renameValue.trim() ? 0.5 : 1,
+          cursor: saving || !renameValue.trim() ? 'not-allowed' : 'pointer',
+        }}
+      >
+        save
+      </button>
+      <button
+        onClick={handleRenameCancel}
+        className="font-mono text-xs px-3 py-1 rounded"
+        style={{
+          background: 'transparent',
+          color: 'var(--text-muted)',
+          border: '1px solid var(--border)',
+          cursor: 'pointer',
+        }}
+      >
+        cancel
+      </button>
+    </div>
+  ) : href ? (
+    <Link
+      to={href}
+      className="font-mono text-base font-medium"
+      style={{ color: 'var(--text-primary)', textDecoration: 'none' }}
+    >
+      {name}
+    </Link>
+  ) : (
+    <span className="font-mono text-base font-medium" style={{ color: 'var(--text-primary)' }}>
+      {name}
+    </span>
+  );
+
   return (
     <div
-      className="rounded-lg px-5 py-4 transition-colors duration-200"
+      className={`rounded-lg px-5 py-4 transition-colors duration-200${href ? ' cursor-pointer' : ''}`}
       style={{
         background: hovered ? 'var(--bg-card-hover)' : 'var(--bg-card)',
         border: `1px solid ${hovered ? 'var(--border-accent)' : 'var(--border)'}`,
@@ -69,55 +129,7 @@ function ListRow({ name, wordCount, editable = true, onRename, onDelete }: ListR
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          {renaming ? (
-            <div className="flex items-center gap-2 flex-1">
-              <input
-                autoFocus
-                value={renameValue}
-                onChange={e => setRenameValue(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') handleRenameConfirm();
-                  if (e.key === 'Escape') handleRenameCancel();
-                }}
-                className="font-mono text-base flex-1 min-w-0 rounded px-2 py-0.5"
-                style={{
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border-accent)',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                }}
-              />
-              <button
-                onClick={handleRenameConfirm}
-                disabled={saving || !renameValue.trim()}
-                className="font-mono text-xs px-3 py-1 rounded"
-                style={{
-                  background: 'var(--gold)',
-                  color: 'var(--bg)',
-                  opacity: saving || !renameValue.trim() ? 0.5 : 1,
-                  cursor: saving || !renameValue.trim() ? 'not-allowed' : 'pointer',
-                }}
-              >
-                save
-              </button>
-              <button
-                onClick={handleRenameCancel}
-                className="font-mono text-xs px-3 py-1 rounded"
-                style={{
-                  background: 'transparent',
-                  color: 'var(--text-muted)',
-                  border: '1px solid var(--border)',
-                  cursor: 'pointer',
-                }}
-              >
-                cancel
-              </button>
-            </div>
-          ) : (
-            <span className="font-mono text-base font-medium" style={{ color: 'var(--text-primary)' }}>
-              {name}
-            </span>
-          )}
+          {nameContent}
           {!renaming && (
             <span className="font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
               {wordCount} {wordCount === 1 ? 'word' : 'words'}
@@ -128,7 +140,7 @@ function ListRow({ name, wordCount, editable = true, onRename, onDelete }: ListR
           <div className="flex items-center gap-2 ml-3">
             {onRename && (
               <button
-                onClick={() => { setRenameValue(name); setRenaming(true); }}
+                onClick={e => { e.stopPropagation(); setRenameValue(name); setRenaming(true); }}
                 aria-label="Rename list"
                 className="transition-opacity duration-150"
                 style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
@@ -140,7 +152,7 @@ function ListRow({ name, wordCount, editable = true, onRename, onDelete }: ListR
             )}
             {onDelete && (
               <button
-                onClick={onDelete}
+                onClick={e => { e.stopPropagation(); onDelete(); }}
                 aria-label="Delete list"
                 className="transition-opacity duration-150"
                 style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
@@ -301,6 +313,7 @@ export default function ListsPage() {
           <ListRow
             name="Alle Wörter"
             wordCount={totalWordCount}
+            href="/"
             editable={false}
           />
           {lists.map(list => (
@@ -308,6 +321,7 @@ export default function ListsPage() {
               key={list.id}
               name={list.name}
               wordCount={list.wordCount}
+              href={`/lists/${list.id}`}
               editable={true}
               onRename={(name) => renameList(list.id, name)}
               onDelete={() => handleDelete(list.id, list.name)}

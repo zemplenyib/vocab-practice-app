@@ -10,6 +10,13 @@ router.get('/', async (c) => {
   return c.json(lists);
 });
 
+router.get('/:id', async (c) => {
+  const id = Number(c.req.param('id'));
+  const list = await listService.getListByIdWithCount(id);
+  if (!list) return c.json({ error: 'List not found' }, 404);
+  return c.json(list);
+});
+
 router.post('/', zValidator('json', ListNameSchema), async (c) => {
   const { name } = c.req.valid('json');
   const result = await listService.createList(name);

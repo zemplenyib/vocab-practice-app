@@ -27,25 +27,27 @@ All inter-package imports use `@vocab/shared` (never relative paths across packa
 - `db.ts` — @libsql/client + Drizzle init, `PRAGMA foreign_keys = ON`, auto-runs migrations on startup.
 - `routes/words.ts` — `GET/POST /api/words`, `PUT /api/words/:id`, `DELETE /api/words/:id`. GET supports optional `listId` filter.
 - `routes/practice.ts` — `GET /api/practice/next`, `POST /api/practice/answer`. GET supports optional `listId` filter.
-- `routes/lists.ts` — `GET/POST /api/lists`, `PUT /api/lists/:id`, `DELETE /api/lists/:id`, `POST/DELETE /api/lists/:id/words/:wordId`.
+- `routes/lists.ts` — `GET /api/lists`, `GET /api/lists/:id`, `POST /api/lists`, `PUT /api/lists/:id`, `DELETE /api/lists/:id`, `POST/DELETE /api/lists/:id/words/:wordId`.
 - `services/wordService.ts` — getAllWords, addWord, getWordById, updateWord, updateWordRating, deleteWord, getWordsByListId.
-- `services/listService.ts` — getAllLists, getListById, createList, renameList, deleteList, linkWord, unlinkWord. Protects "Alle Wörter" sentinel.
+- `services/listService.ts` — getAllLists, getListById, getListByIdWithCount, createList, renameList, deleteList, linkWord, unlinkWord. Protects "Alle Wörter" sentinel. `getListByIdWithCount` includes aggregated word count per list.
 - `services/practiceService.ts` — submitAnswer: evaluates answers, updates rating, records session.
 - `services/selectionService.ts` — selectNextWord (weighted random), recordPracticed (circular buffer, last 5).
 - `migrations/` — Drizzle-generated SQL files, auto-applied on startup.
 
 ### `apps/web/src/`
-- `api/client.ts` — Typed fetch wrapper. All HTTP logic here. `api.words.{list,add,update,delete,unlink}`, `api.practice.{next,answer}`, `api.lists.{list,create,rename,delete,link,unlink}`.
+- `api/client.ts` — Typed fetch wrapper. All HTTP logic here. `api.words.{list,add,update,delete}`, `api.practice.{next,answer}`, `api.lists.{list,get,create,rename,delete,linkWord,unlinkWord}`.
 - `hooks/usePractice.ts` — Practice state machine (IDLE → AWAITING_ANSWER → SHOWING_RESULT). Accepts optional `listId` filter.
-- `hooks/useWords.ts` — Word list fetch + add/update/delete/unlink. Accepts optional `listId` filter.
+- `hooks/useWords.ts` — Word list fetch + add/update/delete/unlinkWord. Accepts optional `listId` filter.
 - `hooks/useLists.ts` — Fetch and manage lists, create/rename/delete, protect "Alle Wörter" sentinel.
-- `pages/HomePage.tsx` — List selector, word list, category stats, add/delete/unlink modals.
+- `pages/HomePage.tsx` — List selector, word list, category stats, add/delete/unlink modals. Renders StatPills for active list.
 - `pages/ListsPage.tsx` — Custom lists management (create, rename, delete), displays "Alle Wörter" as read-only.
+- `pages/ListDetailPage.tsx` — Word list detail view for a specific list at `/lists/:id`. Shows list name, stat pills scoped to list, word grid, and link to add-words view.
+- `pages/AddWordsPage.tsx` — Add-words view at `/lists/:id/add` for linking existing words from the database to the list. Displays all words, greyed-out if already linked, with search filter.
 - `pages/PracticePage.tsx` — List selector in idle state, practice card container, routes through usePractice state.
 - `components/layout/` — AppShell, NavBar (includes /lists route).
 - `components/lists/` — ListSelector component for filtering by list.
 - `components/practice/` — PracticeCard, AnswerInput, ResultDisplay.
-- `components/words/` — WordList, WordCard (includes delete icon), WordBadge, AddWordModal, EditWordModal.
+- `components/words/` — WordList, WordCard (includes delete/unlink icon), WordBadge, StatPills, AddWordModal, EditWordModal.
 - `index.css` — Tailwind imports, CSS variables (dark academia theme), @keyframes.
 
 ---
@@ -73,12 +75,13 @@ All inter-package imports use `@vocab/shared` (never relative paths across packa
 
 ## Frontend Layer
 
-- **Routing**: react-router-dom v6. Three routes: `/` (HomePage), `/lists` (ListsPage), `/practice` (PracticePage).
+- **Routing**: react-router-dom v6. Five routes: `/` (HomePage), `/lists` (ListsPage), `/lists/:id` (ListDetailPage), `/lists/:id/add` (AddWordsPage), `/practice` (PracticePage).
 - **State**: React hooks only (useState). No global state manager.
 - **API calls**: All via `src/api/client.ts`. Never fetch directly in components.
 - **Styling**: Tailwind + CSS variables in `:root`. Fonts: Playfair Display (display), Geist Mono (mono). Colors: `--bg`, `--gold`, `--new`, `--learning`, `--mastered`.
 - **Modal pattern**: Fixed overlay, click-outside-to-close, form state local to component.
 - **Gender toggle**: 3-button (der/blue, die/red, das/yellow). Click again to deselect.
+- **Stat Pills component**: `StatPills.tsx` — extracted, reusable component showing category counts (New/Learning/Mastered) for a word set, used on HomePage and ListDetailPage.
 
 ---
 

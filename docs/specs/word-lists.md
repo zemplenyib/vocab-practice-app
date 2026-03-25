@@ -8,12 +8,13 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 ## User Stories
 - As a user, I want to create named word lists so that I can group vocabulary by topic, lesson, or any other criteria I choose.
 - As a user, I want to rename or delete my custom lists so that I can keep my collections organised as my needs change.
-- As a user, I want to add a word to one or more specific lists so that the same word can appear wherever it is relevant.
+- As a user, I want to add existing words to a specific list so that I can build collections from my existing vocabulary.
 - As a user, I want to filter the Words page by a list so that I can review only the words in that collection.
 - As a user, I want to practise only the words in a chosen list so that I can focus on a specific set.
 - As a user, I want to remove a word from a specific list without deleting the word itself so that I can reorganise without losing vocabulary data.
 - As a user, I want to permanently delete a word from "Alle Wörter" so that I can remove vocabulary I no longer need.
 - As a user, I want the New / Learning / Mastered stats to reflect whichever list I am currently viewing so that the counts are meaningful in context.
+- As a user, I want to navigate directly to a word list's word view via a URL so that I can bookmark or share a specific list.
 
 ## Scope
 
@@ -26,6 +27,9 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - Word deletion: permanently deletes the word from the database when on "Alle Wörter"; unlinks the word from the current list when on a specific list.
 - Linking a newly added word to the currently selected list when that list is not "Alle Wörter".
 - New/Learning/Mastered stat pills on the Words page updating to reflect the active list.
+- A dedicated word list view at `/lists/:id` showing the words in a specific list, with the same edit and delete/unlink controls as the Words page, and stat pills reflecting that list.
+- An add-words view at `/lists/:id/add` for linking existing words from the database to the list.
+- Rename and delete controls for custom lists that remain on the Lists page (`/lists`), not in the word list view.
 
 **Out of scope:**
 - Reordering words within a list.
@@ -34,6 +38,7 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - Bulk add/remove of words across lists from a single action.
 - Any change to the rating system or practice scoring logic.
 - Any change to the existing edit-word flow (`EditWordModal`, `PUT /api/words/:id`).
+- Creating new words from within the add-words view (only existing words can be linked).
 
 ## Functional Requirements
 
@@ -68,6 +73,26 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - When a specific list is the active list and the user activates delete, a confirmation prompt must be shown. On confirmation, the word is unlinked from that list only; the word itself and any links to other lists are preserved. The word remains visible in "Alle Wörter" and any other lists it belongs to.
 - The confirmation prompt must clearly state the action: "Delete word permanently?" vs "Remove from this list?".
 
+### Word list view (`/lists/:id`)
+- Navigating to `/lists/:id` must display a page showing all words linked to the identified list.
+- The page heading must show the list name.
+- Stat pills (New / Learning / Mastered counts) must appear below the heading and must reflect the counts for words in that specific list, using the same visual style as the Words page stat pills.
+- Each word is displayed as a WordCard with the same controls available on the Words page: an edit pencil (opens `EditWordModal`) and a delete/unlink icon (visible on hover).
+- The delete/unlink control on this view always unlinks the word from this specific list (not a permanent deletion), because the context is always a specific list. A confirmation prompt must state "Remove from this list?".
+- An "Add words" button must link to `/lists/:id/add`.
+- If the list has no words, an empty state message must be shown (e.g., "No words in this list — add some to get started") alongside the "Add words" button.
+- After unlinking a word, the word card is immediately removed from the view without a full page reload.
+
+### Add-words view (`/lists/:id/add`)
+- Navigating to `/lists/:id/add` must display a view for linking existing words to the identified list.
+- All words currently in the database must be shown.
+- Words that are already linked to this list must be shown in a visually greyed-out state and must not be selectable.
+- A search bar must be present and must filter the word list on both the German and the Hungarian fields simultaneously (case-insensitive, substring match).
+- Each non-greyed word must have an affordance (e.g., a "+" button or checkbox) that links it to the current list immediately on activation (no separate save step).
+- After linking a word, it must immediately transition to the greyed-out state to confirm success; the user must not be forced to leave the view to add more words.
+- A "Back" / "Done" control must navigate back to `/lists/:id`. Words linked during the add-words session must appear in the word list view immediately (no reload required).
+- No new-word creation is available from this view; only existing words can be linked.
+
 ### "Alle Wörter" invariant
 - "Alle Wörter" must never be stored as a database row. It is a client/API-level concept resolved at query time to mean "no list filter applied".
 - No API route may allow creation, modification, or deletion of a list with the name "Alle Wörter" (case-insensitive).
@@ -81,7 +106,9 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - Displays a page heading ("Lists") consistent with the existing heading style (`font-display`).
 - Below the heading, a "+ new list" button (styled like the existing "+ add word" button on the Words page) opens an inline input or modal for entering the list name.
 - Each list row shows: list name, word count as a secondary label, and — for custom lists only — rename and delete icon buttons visible on hover (consistent with the hover-reveal pattern used on WordCard).
+- Each custom list row (and "Alle Wörter") must be clickable (or have an explicit link) to navigate to `/lists/:id` (or `/` for "Alle Wörter").
 - "Alle Wörter" row shows the name and total word count with no action controls.
+- Rename and delete controls are present only on this page; they do not appear in the word list view.
 - Deleting a list must show a confirmation prompt stating the list name and noting that words will not be deleted.
 - An empty state ("no lists yet — create one to begin") is shown when no custom lists exist.
 
@@ -99,6 +126,24 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - A trash / remove icon appears on hover to the right of the existing edit pencil.
 - Icon appearance and behaviour follow the same hover-reveal and color conventions as the edit pencil.
 - Confirmation is a browser `window.confirm` dialog or a lightweight inline modal — either is acceptable.
+
+### Word list view (`/lists/:id`)
+- Page heading displays the list name in the same `font-display` style used on other pages.
+- Stat pills (New / Learning / Mastered) appear directly below the heading, identical in visual style to those on the Words page but scoped to the list's words.
+- An "Add words" button appears near the heading (e.g., top-right, styled consistently with other action buttons), linking to `/lists/:id/add`.
+- The word grid uses the same `WordCard` component as the Words page.
+- On hover, each WordCard shows the edit pencil and a remove icon (unlink from list). Rename/delete list controls are not present on this page.
+- Removing a word from the list causes the card to disappear from the grid immediately (optimistic or post-confirm update).
+- Empty state message ("No words in this list — add some to get started") is shown when the list has no words; the "Add words" button remains visible.
+
+### Add-words view (`/lists/:id/add`)
+- Page heading indicates the action context, e.g., "Add words to [list name]".
+- A search bar appears near the top, clearly labelled (e.g., placeholder "Search German or Hungarian…").
+- Words are displayed in a scrollable list or grid; the visual treatment may be simpler than the full `WordCard` (e.g., a compact row showing German and Hungarian).
+- Words already in the list are shown greyed out with no interactive add control; their presence confirms they are already linked.
+- Words not yet in the list show a "+" or equivalent affordance; activating it immediately links the word and transitions that item to the greyed-out state.
+- A "Back" or "Done" button in the heading area navigates back to `/lists/:id`.
+- No `AddWordModal` or new-word creation affordance is present on this view.
 
 ## Data Requirements
 
@@ -133,6 +178,7 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 | DELETE | `/api/lists/:id/words/:wordId` | Unlink a word from a list. Returns 404 if list or word not found. |
 | DELETE | `/api/words/:id` | Permanently delete a word (new endpoint). Cascades to `word_lists` and `practice_sessions`. Returns 404 if not found. |
 | GET | `/api/words?listId=` | Existing `GET /api/words` gains an optional `listId` query parameter. When omitted, returns all words. When provided, returns only words linked to that list. |
+| GET | `/api/words?excludeListId=` | Returns all words not yet linked to the specified list. Used by the add-words view to fetch candidates. Can be combined with a `q` (search) query parameter for filtering. |
 | GET | `/api/practice/next?listId=` | Existing endpoint gains optional `listId` query parameter. When omitted, selects from all words. When provided, selects only from words in that list. |
 
 ### Validation
@@ -150,3 +196,9 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - **Switching lists mid-session (Practice page)**: Changing the list selector while in IDLE state is permitted. Changing it while in any non-IDLE state is prevented by hiding the selector; if a user navigates away and back, the page resets to IDLE and the selector reverts to "Alle Wörter".
 - **Network error during list operations**: The Lists page must display an error message consistent with the existing error style (`var(--danger)` colour, `font-mono` text) when any API call fails.
 - **`GET /api/words?listId=X` with an unknown listId**: Returns `404` with `{ error: "List not found" }`.
+- **Navigating to `/lists/:id` for a non-existent list**: The word list view must show an error state (e.g., "List not found") rather than an empty word grid.
+- **Navigating to `/lists/:id/add` for a non-existent list**: Same — display an error state and offer a link back to `/lists`.
+- **All words already in the list on the add-words view**: The add-words view must display all words greyed out and may show a message such as "All words are already in this list". The view remains navigable; no error state.
+- **Search yields no results on the add-words view**: A "No words match your search" message is shown; the search bar remains active.
+- **Word linked in add-words view then immediately unlinked in another tab**: No special handling required; the greyed-out state reflects the local session. A full page refresh will reconcile state if needed.
+- **`POST /api/lists/:id/words/:wordId` for a word already in the list**: Must be idempotent — returns `200 OK` without error, leaving the link unchanged.

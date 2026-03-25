@@ -52,6 +52,7 @@ After receiving answers, check if any critical gaps remain. If yes, ask one focu
 **New feature** → create `docs/specs/<kebab-case-feature-name>.md`
 **Change to existing feature** → update the existing spec file in place, preserving sections that are unchanged
 
+
 Use this format:
 
 ```markdown

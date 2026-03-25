@@ -42,6 +42,14 @@ npm exec pnpm --filter @vocab/api test
 ```
 Report full output. If tests fail, diagnose whether the issue is in the test or the source code, and report clearly. Only fix test-side issues. Never skip or suppress a failure.
 
+## E2E gap detection
+
+After unit/integration tests pass, check for unimplemented E2E cases:
+1. Read `docs/e2e-tests.md` and extract all `TC-NNN` IDs.
+2. Search `apps/e2e/tests/` for `// TC-NNN` comments. Any ID with no match is unimplemented.
+3. If any are missing: report them (ID + title), then implement a Playwright test for each in `apps/e2e/tests/`. Each test file must begin with a `// TC-NNN` comment.
+4. Run `npm exec pnpm test:e2e` from the repo root and report results. Failures block completion — diagnose and fix before declaring done.
+
 ## Quality bar
 - Read existing test files before writing new ones — do not duplicate test cases that are already covered.
 - Every public function or endpoint in the diff must have at least one test (new or existing).

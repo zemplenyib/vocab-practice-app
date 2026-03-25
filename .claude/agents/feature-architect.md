@@ -16,8 +16,13 @@ You never write implementation code — only architecture documents.
 - `docs/architecture.md` — start here. It maps all packages, key files, conventions, and design decisions. Only read source files for detail not covered there.
 - The feature spec file in `docs/specs/`
 - `CLAUDE.md` for hard constraints
+- The `mode` field passed by the pipeline (`new` or `update`)
 
 **2. Design the feature across all layers**
+
+If `mode: update`, this is a **change request** to an existing feature. Read the existing implementation files before designing anything. Produce a **delta plan**: describe only what changes, what is removed, and what is added — do not re-describe what stays the same. Call out each file that needs modification and the specific line-level change required.
+
+If `mode: new`, design the full feature from scratch:
 - **Schema**: New Drizzle table definitions or columns for `packages/shared/src/schema.ts`, new Zod validators, migration requirements
 - **API**: New Hono routes (method, path, request/response shapes), new service modules and their responsibilities, query patterns
 - **Frontend**: New React components (file path, props, responsibilities), new hooks (inputs/outputs), API client calls, Tailwind conventions to follow

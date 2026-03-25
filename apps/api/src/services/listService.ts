@@ -29,6 +29,21 @@ export async function getListById(id: number): Promise<List | null> {
   return row ?? null;
 }
 
+export async function getListByIdWithCount(id: number): Promise<ListWithCount | null> {
+  const [row] = await db
+    .select({
+      id: lists.id,
+      name: lists.name,
+      createdAt: lists.createdAt,
+      wordCount: sql<number>`count(${wordLists.wordId})`.as('word_count'),
+    })
+    .from(lists)
+    .leftJoin(wordLists, eq(wordLists.listId, lists.id))
+    .where(eq(lists.id, id))
+    .groupBy(lists.id);
+  return row ?? null;
+}
+
 export async function createList(name: string): Promise<{ list?: List; error?: 'protected' | 'duplicate' }> {
   if (isProtectedName(name)) return { error: 'protected' };
   try {

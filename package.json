@@ -7,7 +7,8 @@
     "dev:web": "pnpm --filter @vocab/web dev",
     "build": "pnpm -r build && node -e \"require('fs').cpSync('apps/web/dist', 'apps/api/public', {recursive:true})\"",
     "db:migrate": "pnpm --filter @vocab/api db:migrate",
-    "db:generate": "pnpm --filter @vocab/api db:generate"
+    "db:generate": "pnpm --filter @vocab/api db:generate",
+    "test:e2e": "pnpm --filter @vocab/e2e test"
   },
   "devDependencies": {
     "typescript": "^5.4.5"

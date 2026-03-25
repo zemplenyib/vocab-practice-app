@@ -28,6 +28,7 @@ export const api = {
   },
   lists: {
     list: () => request<ListWithCount[]>('GET', '/lists'),
+    get: (id: number) => request<ListWithCount>('GET', `/lists/${id}`),
     create: (name: string) => request<List>('POST', '/lists', { name }),
     rename: (id: number, name: string) => request<List>('PUT', `/lists/${id}`, { name }),
     delete: (id: number) => request<void>('DELETE', `/lists/${id}`),

@@ -121,6 +121,35 @@ describe('GET /api/lists', () => {
   });
 });
 
+describe('GET /api/lists/:id', () => {
+  beforeEach(clearAll);
+
+  it('returns 200 with list data and wordCount for a valid id', async () => {
+    const list = await createListViaDb('Fruits');
+    const res = await app.request(`/api/lists/${list.id}`);
+    expect(res.status).toBe(200);
+    const body = await res.json() as { id: number; name: string; wordCount: number };
+    expect(body.id).toBe(list.id);
+    expect(body.name).toBe('Fruits');
+    expect(body.wordCount).toBe(0);
+  });
+
+  it('returns wordCount reflecting linked words', async () => {
+    const list = await createListViaDb('Fruits');
+    const word = await insertWord();
+    await app.request(`/api/lists/${list.id}/words/${word.id}`, { method: 'POST' });
+    const res = await app.request(`/api/lists/${list.id}`);
+    expect(res.status).toBe(200);
+    const body = await res.json() as { wordCount: number };
+    expect(body.wordCount).toBe(1);
+  });
+
+  it('returns 404 for a non-existent list id', async () => {
+    const res = await app.request('/api/lists/999');
+    expect(res.status).toBe(404);
+  });
+});
+
 describe('PUT /api/lists/:id', () => {
   beforeEach(clearAll);
 

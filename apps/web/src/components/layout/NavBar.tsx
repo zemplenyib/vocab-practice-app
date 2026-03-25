@@ -11,7 +11,7 @@ export default function NavBar() {
         </span>
         <div className="flex items-center gap-1">
           {([['/', 'Words'], ['/lists', 'Lists'], ['/practice', 'Practice']] as const).map(([path, label]) => {
-            const active = pathname === path;
+            const active = path === '/' ? pathname === '/' : pathname.startsWith(path);
             return (
               <Link
                 key={path}

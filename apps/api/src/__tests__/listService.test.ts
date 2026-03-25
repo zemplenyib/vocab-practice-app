@@ -17,6 +17,7 @@ const {
   linkWord,
   unlinkWord,
   getListById,
+  getListByIdWithCount,
 } = await import('../services/listService.js');
 
 // Helper to clear tables between tests
@@ -230,5 +231,44 @@ describe('getListById', () => {
   it('returns null for a non-existent id', async () => {
     const found = await getListById(999);
     expect(found).toBeNull();
+  });
+});
+
+describe('getListByIdWithCount', () => {
+  beforeEach(clearAll);
+
+  it('returns null for a non-existent id', async () => {
+    const result = await getListByIdWithCount(999);
+    expect(result).toBeNull();
+  });
+
+  it('returns a ListWithCount with wordCount=0 when no words are linked', async () => {
+    const { list } = (await createList('Fruits')) as { list: { id: number; name: string } };
+    const result = await getListByIdWithCount(list.id);
+    expect(result).not.toBeNull();
+    expect(result!.id).toBe(list.id);
+    expect(result!.name).toBe('Fruits');
+    expect(result!.wordCount).toBe(0);
+  });
+
+  it('returns wordCount=2 when two words are linked to the list', async () => {
+    const { list } = (await createList('Fruits')) as { list: { id: number } };
+    const word1 = await insertWord('alma', 'Apfel');
+    const word2 = await insertWord('körte', 'Birne');
+    await linkWord(list.id, word1.id);
+    await linkWord(list.id, word2.id);
+    const result = await getListByIdWithCount(list.id);
+    expect(result!.wordCount).toBe(2);
+  });
+
+  it('only counts words linked to the requested list, not other lists', async () => {
+    const { list: list1 } = (await createList('Fruits')) as { list: { id: number } };
+    const { list: list2 } = (await createList('Animals')) as { list: { id: number } };
+    const word1 = await insertWord('alma', 'Apfel');
+    const word2 = await insertWord('kutya', 'Hund');
+    await linkWord(list1.id, word1.id);
+    await linkWord(list2.id, word2.id);
+    const result = await getListByIdWithCount(list1.id);
+    expect(result!.wordCount).toBe(1);
   });
 });

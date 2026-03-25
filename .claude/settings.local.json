@@ -15,7 +15,14 @@
       "Bash(taskkill /PID 36600 /F)",
       "Bash(taskkill /PID 36712 /F)",
       "Bash(node_modules/.bin/tsx src/seed.ts)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(node_modules/.bin/drizzle-kit generate:*)",
+      "Bash(/d/repos/vocab-practice-app/apps/api/node_modules/.bin/vitest run:*)",
+      "Bash(start:*)",
+      "Bash(node_modules/.bin/vitest run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/api/lists)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

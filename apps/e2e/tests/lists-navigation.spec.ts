@@ -33,12 +33,12 @@ test.describe('TC-001: Clicking a list navigates to its word view', () => {
     await page.goto('/lists');
     await page.waitForLoadState('networkidle');
 
-    // The list row should be visible
-    const listLink = page.getByRole('link', { name: listName });
-    await expect(listLink).toBeVisible();
+    // The list row should be visible — find it by text, then click the card itself
+    const listRow = page.locator('a').filter({ hasText: listName }).first();
+    await expect(listRow).toBeVisible();
 
-    // Click on the list
-    await listLink.click();
+    // Click anywhere on the card (not just the link text) to simulate a real user click
+    await listRow.click({ position: { x: 10, y: 10 } });
 
     // Verify we've navigated to the list detail view
     await page.waitForLoadState('networkidle');

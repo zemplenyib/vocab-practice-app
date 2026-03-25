@@ -23,6 +23,7 @@ Produce a short test plan first:
 ```
 
 **3. Write tests**
+- **Always write test files to the worktree path you were given as context.** If the pipeline passed a worktree path (e.g. `D:\repos\vocab-practice-app\.claude\worktrees\agent-xxxxx`), all test files must go there — never to the main repo. Only write to the main repo if no worktree was specified.
 - Place all test files in `apps/api/src/__tests__/` or `apps/web/src/__tests__/` depending on which app is affected. Mirror the source file name: `wordService.ts` → `__tests__/wordService.test.ts`.
 - Use Vitest (preferred). If not installed, add it to the relevant `package.json` devDependencies with a minimal `vitest.config.ts`.
 - Use `@libsql/client` in-memory (`:memory:`) for all DB tests — never touch `vocab.db`.

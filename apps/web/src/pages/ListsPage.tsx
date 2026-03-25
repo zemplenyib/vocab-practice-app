@@ -59,7 +59,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
     setRenameError(null);
   };
 
-  const nameContent = renaming ? (
+  const nameText = renaming ? (
     <div className="flex items-center gap-2 flex-1">
       <input
         autoFocus
@@ -69,6 +69,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
           if (e.key === 'Enter') handleRenameConfirm();
           if (e.key === 'Escape') handleRenameCancel();
         }}
+        onClick={e => e.stopPropagation()}
         className="font-mono text-base flex-1 min-w-0 rounded px-2 py-0.5"
         style={{
           background: 'var(--bg)',
@@ -78,7 +79,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
         }}
       />
       <button
-        onClick={handleRenameConfirm}
+        onClick={e => { e.preventDefault(); e.stopPropagation(); handleRenameConfirm(); }}
         disabled={saving || !renameValue.trim()}
         className="font-mono text-xs px-3 py-1 rounded"
         style={{
@@ -91,7 +92,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
         save
       </button>
       <button
-        onClick={handleRenameCancel}
+        onClick={e => { e.preventDefault(); e.stopPropagation(); handleRenameCancel(); }}
         className="font-mono text-xs px-3 py-1 rounded"
         style={{
           background: 'transparent',
@@ -103,33 +104,17 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
         cancel
       </button>
     </div>
-  ) : href ? (
-    <Link
-      to={href}
-      className="font-mono text-base font-medium"
-      style={{ color: 'var(--text-primary)', textDecoration: 'none' }}
-    >
-      {name}
-    </Link>
   ) : (
     <span className="font-mono text-base font-medium" style={{ color: 'var(--text-primary)' }}>
       {name}
     </span>
   );
 
-  return (
-    <div
-      className={`rounded-lg px-5 py-4 transition-colors duration-200${href ? ' cursor-pointer' : ''}`}
-      style={{
-        background: hovered ? 'var(--bg-card-hover)' : 'var(--bg-card)',
-        border: `1px solid ${hovered ? 'var(--border-accent)' : 'var(--border)'}`,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+  const rowContent = (
+    <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          {nameContent}
+          {nameText}
           {!renaming && (
             <span className="font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
               {wordCount} {wordCount === 1 ? 'word' : 'words'}
@@ -140,7 +125,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
           <div className="flex items-center gap-2 ml-3">
             {onRename && (
               <button
-                onClick={e => { e.stopPropagation(); setRenameValue(name); setRenaming(true); }}
+                onClick={e => { e.preventDefault(); e.stopPropagation(); setRenameValue(name); setRenaming(true); }}
                 aria-label="Rename list"
                 className="transition-opacity duration-150"
                 style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
@@ -152,7 +137,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
             )}
             {onDelete && (
               <button
-                onClick={e => { e.stopPropagation(); onDelete(); }}
+                onClick={e => { e.preventDefault(); e.stopPropagation(); onDelete(); }}
                 aria-label="Delete list"
                 className="transition-opacity duration-150"
                 style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
@@ -170,6 +155,36 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
           {renameError}
         </p>
       )}
+    </>
+  );
+
+  const rowStyle = {
+    background: hovered ? 'var(--bg-card-hover)' : 'var(--bg-card)',
+    border: `1px solid ${hovered ? 'var(--border-accent)' : 'var(--border)'}`,
+  };
+
+  if (href && !renaming) {
+    return (
+      <Link
+        to={href}
+        className="block rounded-lg px-5 py-4 transition-colors duration-200 cursor-pointer"
+        style={{ ...rowStyle, textDecoration: 'none' }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {rowContent}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-lg px-5 py-4 transition-colors duration-200"
+      style={rowStyle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {rowContent}
     </div>
   );
 }

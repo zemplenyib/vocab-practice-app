@@ -17,13 +17,13 @@ export default function AnswerInput({ onSubmit, disabled }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(german, gender || null);
+    onSubmit(german.replaceAll('ss', 'ß'), gender || null);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <div className="font-mono text-xs mb-2" style={{ color: 'var(--text-muted)' }}>gender</div>
+
         <div className="flex gap-2">
           {genderConfig.map(({ g, color, dim }) => {
             const active = gender === g;
@@ -47,7 +47,7 @@ export default function AnswerInput({ onSubmit, disabled }: Props) {
       </div>
 
       <div>
-        <div className="font-mono text-xs mb-2" style={{ color: 'var(--text-muted)' }}>german translation</div>
+
         <input
           className="w-full rounded-md px-4 py-3 font-mono text-lg outline-none transition-colors duration-150"
           style={{
@@ -59,7 +59,7 @@ export default function AnswerInput({ onSubmit, disabled }: Props) {
           onChange={e => setGerman(e.target.value)}
           placeholder="type here..."
           autoFocus
-          required
+
           onFocus={e => (e.target.style.borderColor = 'var(--gold-dim)')}
           onBlur={e => (e.target.style.borderColor = 'var(--border)')}
         />

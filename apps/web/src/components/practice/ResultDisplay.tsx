@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { AnswerResult } from '@vocab/shared';
 import WordBadge from '../words/WordBadge';
 
@@ -10,6 +11,12 @@ export default function ResultDisplay({ result, onNext }: Props) {
   const correct = result.correct;
   const color = correct ? 'var(--mastered)' : 'var(--danger)';
   const dim = correct ? 'var(--mastered-dim)' : 'var(--danger-dim)';
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Enter') onNext(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onNext]);
 
   return (
     <div className="space-y-4 animate-fade-up">
@@ -34,10 +41,7 @@ export default function ResultDisplay({ result, onNext }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-1">
-        <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>
-          rating → {result.newRating}
-        </span>
+      <div className="flex items-center justify-end px-1">
         <WordBadge category={result.category} />
       </div>
 

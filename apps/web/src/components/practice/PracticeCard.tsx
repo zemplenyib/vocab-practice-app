@@ -17,10 +17,7 @@ export default function PracticeCard({ word, result, loading, onSubmit, onNext }
       style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}
     >
       <div className="text-center space-y-2">
-        <div className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
-          translate to german
-        </div>
-        <div className="font-display text-5xl font-semibold" style={{ color: 'var(--text-primary)', lineHeight: 1.2 }}>
+<div className="font-display text-5xl font-semibold" style={{ color: 'var(--text-primary)', lineHeight: 1.2 }}>
           {word.hungarian}
         </div>
       </div>

@@ -1,7 +1,6 @@
 ---
 name: commit-to-git
 description: Review, stage, and commit current changes to git with a conventional commit message.
-disable-model-invocation: true
 argument-hint: context or intent
 ---
 

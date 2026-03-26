@@ -22,7 +22,13 @@
       "Bash(node_modules/.bin/vitest run:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/api/lists)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(git:*)",
+      "Bash(wt=\"/d/repos/vocab-practice-app/.claude/worktrees/agent-a97da62f\")",
+      "Bash(main=\"/d/repos/vocab-practice-app\")",
+      "Bash(__NEW_LINE_4171ea2317e77065__ cp:*)",
+      "Bash(cp \"$wt/apps/web/package.json\" \"$main/apps/web/package.json\")",
+      "Bash(cp \"$wt/pnpm-lock.yaml\" \"$main/pnpm-lock.yaml\")"
     ]
   }
 }

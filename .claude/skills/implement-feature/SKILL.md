@@ -54,7 +54,7 @@ Run the `feature-implementer` agent in `isolation: "worktree"` with the architec
 _Checkpoint: record the worktree branch name and list of files changed._
 
 **Step 4 — Tests**
-Run the `test-engineer` agent with the implemented code. It:
+Run the `test-engineer` agent **in the same worktree as step 3** — do NOT use `isolation: "worktree"` here. Pass the worktree path (recorded in the step 3 checkpoint) as the working directory so the agent sees the implementer's uncommitted changes. The agent:
 1. Writes and runs Vitest unit/integration tests. If they fail, ask the user: "Are the tests wrong, or is the implementation wrong?" Route to the appropriate fixer and re-run until passing.
 2. Detects any unimplemented E2E cases in `docs/e2e-tests.md`, implements missing Playwright tests in `apps/e2e/tests/`, then runs `npm exec pnpm test:e2e`. E2E failures also block the pipeline — diagnose and fix before proceeding.
 _Checkpoint: record Vitest results (pass/fail counts) and E2E results (pass/fail counts)._

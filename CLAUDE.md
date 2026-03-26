@@ -47,6 +47,16 @@ pm2 start pm2.config.js
 
 pnpm is not globally installed. Use `npm exec pnpm <command>` or run binaries from `apps/api/node_modules/.bin/` directly.
 
+## Agent conventions
+
+These apply to all agents working in this repo:
+
+- **File discovery**: Use `Glob`/`Grep` tools — never `ls`, `find`, or `rg` via Bash.
+- **Check deps before assuming**: Read `package.json` before assuming a dependency (e.g. vitest) is installed. Install via `npm exec pnpm -- --filter <package> add -D <dep>` if missing.
+- **Run tests via pnpm scripts**: Use `npm exec pnpm --filter @vocab/api test` or equivalent — never invoke test binaries by absolute path.
+- **Directory creation**: Use the `Write` tool (creates parent dirs automatically) — never `mkdir` via Bash.
+- **Worktree awareness**: If running in a worktree, verify the expected source files are present before reading or writing. If the worktree is missing files from a prior implementation step, you are likely in the wrong worktree — check with `git worktree list`.
+
 ## Database
 
 SQLite file: `apps/api/vocab.db` (resolved relative to where the API process runs, gitignored). Migrations run automatically on API startup via `migrate()` in `apps/api/src/db.ts`.

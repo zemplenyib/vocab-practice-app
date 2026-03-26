@@ -20,8 +20,9 @@ COPY apps/api ./apps/api
 COPY apps/web ./apps/web
 COPY packages/shared ./packages/shared
 
-# Build web and api (@vocab/shared has no build step — imported as TS source)
-RUN pnpm --filter @vocab/web build && \
+# Build shared first, then web and api
+RUN pnpm --filter @vocab/shared build && \
+    pnpm --filter @vocab/web build && \
     pnpm --filter @vocab/api build
 
 # Copy compiled frontend into API's public/ dir
@@ -43,7 +44,7 @@ COPY packages/shared/package.json ./packages/shared/
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy compiled output from builder
-# (@vocab/shared is compiled into apps/api/dist by tsc — no separate copy needed)
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/public ./apps/api/public
 

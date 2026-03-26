@@ -40,12 +40,12 @@ All inter-package imports use `@vocab/shared` (never relative paths across packa
 - `hooks/useWords.ts` — Word list fetch + add/update/delete/unlinkWord. Accepts optional `listId` filter.
 - `hooks/useLists.ts` — Fetch and manage lists, create/rename/delete, protect "Alle Wörter" sentinel.
 - `pages/HomePage.tsx` — List selector, word list, category stats, add/delete/unlink modals. Renders StatPills for active list.
-- `pages/ListsPage.tsx` — Custom lists management (create, rename, delete), displays "Alle Wörter" as read-only.
+- `pages/ListsPage.tsx` — Custom lists management (create, rename, delete), displays "Alle Wörter" as read-only. Each custom list row has a "..." dropdown menu with Rename and Delete options.
 - `pages/ListDetailPage.tsx` — Word list detail view for a specific list at `/lists/:id`. Shows list name, stat pills scoped to list, word grid, and link to add-words view.
 - `pages/AddWordsPage.tsx` — Add-words view at `/lists/:id/add` for linking existing words from the database to the list. Displays all words, greyed-out if already linked, with search filter.
 - `pages/PracticePage.tsx` — List selector in idle state, practice card container, routes through usePractice state.
 - `components/layout/` — AppShell, NavBar (includes /lists route).
-- `components/lists/` — ListSelector component for filtering by list.
+- `components/lists/` — ListSelector component for filtering by list. RenameListModal for renaming a list via modal dialog.
 - `components/practice/` — PracticeCard, AnswerInput, ResultDisplay.
 - `components/words/` — WordList, WordCard (includes delete/unlink icon), WordBadge, StatPills, AddWordModal, EditWordModal.
 - `index.css` — Tailwind imports, CSS variables (dark academia theme), @keyframes.

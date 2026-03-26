@@ -46,9 +46,9 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 - The app must expose a "Lists" navigation entry that routes to a dedicated Lists page (`/lists`).
 - The Lists page must display all custom lists by name, each with its word count.
 - The user must be able to create a new list by providing a name; the name must be non-empty and must not duplicate an existing list name (case-insensitive comparison).
-- The user must be able to rename any custom list; the same uniqueness constraint applies.
-- The user must be able to delete any custom list; deletion removes the list and all its word-list links but must not delete any words.
-- "Alle Wörter" must appear on the Lists page (so the user can see it exists) but must not offer rename or delete controls.
+- The user must be able to rename any custom list via the "..." overflow menu on that list's row; a modal must open for entering the new name. The same name uniqueness constraint applies.
+- The user must be able to delete any custom list via the "..." overflow menu on that list's row; deletion removes the list and all its word-list links but must not delete any words.
+- "Alle Wörter" must appear on the Lists page (so the user can see it exists) but must not offer a "..." menu, rename control, or delete control.
 
 ### List selector — Words page
 - The Words page must display a list selector above the word grid, defaulting to "Alle Wörter" on load.
@@ -104,13 +104,16 @@ Word Lists allow users to organise their vocabulary into named collections. Word
 
 ### Lists page (`/lists`)
 - Displays a page heading ("Lists") consistent with the existing heading style (`font-display`).
-- Below the heading, a "+ new list" button (styled like the existing "+ add word" button on the Words page) opens an inline input or modal for entering the list name.
-- Each list row shows: list name, word count as a secondary label, and — for custom lists only — rename and delete icon buttons visible on hover (consistent with the hover-reveal pattern used on WordCard).
+- Below the heading, a "+ new list" button (styled like the existing "+ add word" button on the Words page) opens an inline input for entering the list name.
+- Each list row shows: list name, word count as a secondary label, and — for custom lists only — a "..." overflow menu button.
+- The "..." button on a custom list row opens a dropdown menu with two items: "Rename" and "Delete".
+- The "Alle Wörter" row does not show a "..." button or any action controls at all — no hover state, no menu.
 - Each custom list row (and "Alle Wörter") must be clickable (or have an explicit link) to navigate to `/lists/:id` (or `/` for "Alle Wörter").
-- "Alle Wörter" row shows the name and total word count with no action controls.
 - Rename and delete controls are present only on this page; they do not appear in the word list view.
-- Deleting a list must show a confirmation prompt stating the list name and noting that words will not be deleted.
-- An empty state ("no lists yet — create one to begin") is shown when no custom lists exist.
+- Clicking "Rename" in the dropdown menu opens the `RenameListModal` component where the user can enter a new name for the list (consistent with the existing modal pattern in the app, e.g. `AddWordModal`/`EditWordModal`).
+- Clicking "Delete" in the dropdown menu triggers a confirmation prompt (stating the list name and noting that words will not be deleted). No intermediate step is added between clicking "Delete" and the confirmation prompt.
+- The dropdown menu is dismissed by clicking outside it or pressing Escape.
+- An empty state ("no lists yet — create one to organise your words") is shown when no custom lists exist.
 
 ### Words page — list selector
 - Displayed as a segmented control, tab row, or dropdown directly above the stat pills.

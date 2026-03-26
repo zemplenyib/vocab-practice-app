@@ -1,160 +1,108 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useLists } from '../hooks/useLists';
 import { api } from '../api/client';
-
-function PencilIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/>
-      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-      <path d="M10 11v6"/>
-      <path d="M14 11v6"/>
-      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-    </svg>
-  );
-}
+import RenameListModal from '../components/lists/RenameListModal';
 
 interface ListRowProps {
   name: string;
   wordCount: number;
   href?: string;
   editable?: boolean;
-  onRename?: (name: string) => Promise<string | null>;
+  onRenameClick?: () => void;
   onDelete?: () => void;
 }
 
-function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }: ListRowProps) {
+function ListRow({ name, wordCount, href, editable = true, onRenameClick, onDelete }: ListRowProps) {
   const [hovered, setHovered] = useState(false);
-  const [renaming, setRenaming] = useState(false);
-  const [renameValue, setRenameValue] = useState(name);
-  const [renameError, setRenameError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleRenameConfirm = async () => {
-    if (!onRename) return;
-    setSaving(true);
-    setRenameError(null);
-    const err = await onRename(renameValue);
-    setSaving(false);
-    if (err) {
-      setRenameError(err);
-    } else {
-      setRenaming(false);
-    }
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
 
-  const handleRenameCancel = () => {
-    setRenaming(false);
-    setRenameValue(name);
-    setRenameError(null);
-  };
+    const handleMouseDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
 
-  const nameText = renaming ? (
-    <div className="flex items-center gap-2 flex-1">
-      <input
-        autoFocus
-        value={renameValue}
-        onChange={e => setRenameValue(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter') handleRenameConfirm();
-          if (e.key === 'Escape') handleRenameCancel();
-        }}
-        onClick={e => e.stopPropagation()}
-        className="font-mono text-base flex-1 min-w-0 rounded px-2 py-0.5"
-        style={{
-          background: 'var(--bg)',
-          border: '1px solid var(--border-accent)',
-          color: 'var(--text-primary)',
-          outline: 'none',
-        }}
-      />
-      <button
-        onClick={e => { e.preventDefault(); e.stopPropagation(); handleRenameConfirm(); }}
-        disabled={saving || !renameValue.trim()}
-        className="font-mono text-xs px-3 py-1 rounded"
-        style={{
-          background: 'var(--gold)',
-          color: 'var(--bg)',
-          opacity: saving || !renameValue.trim() ? 0.5 : 1,
-          cursor: saving || !renameValue.trim() ? 'not-allowed' : 'pointer',
-        }}
-      >
-        save
-      </button>
-      <button
-        onClick={e => { e.preventDefault(); e.stopPropagation(); handleRenameCancel(); }}
-        className="font-mono text-xs px-3 py-1 rounded"
-        style={{
-          background: 'transparent',
-          color: 'var(--text-muted)',
-          border: '1px solid var(--border)',
-          cursor: 'pointer',
-        }}
-      >
-        cancel
-      </button>
-    </div>
-  ) : (
-    <span className="font-mono text-base font-medium" style={{ color: 'var(--text-primary)' }}>
-      {name}
-    </span>
-  );
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [menuOpen]);
 
   const rowContent = (
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          {nameText}
-          {!renaming && (
-            <span className="font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
-              {wordCount} {wordCount === 1 ? 'word' : 'words'}
-            </span>
-          )}
+          <span className="font-mono text-base font-medium" style={{ color: 'var(--text-primary)' }}>
+            {name}
+          </span>
+          <span className="font-mono text-sm" style={{ color: 'var(--text-muted)' }}>
+            {wordCount} {wordCount === 1 ? 'word' : 'words'}
+          </span>
         </div>
-        {editable && !renaming && (
-          <div className="flex items-center gap-2 ml-3">
-            {onRename && (
-              <button
-                onClick={e => { e.preventDefault(); e.stopPropagation(); setRenameValue(name); setRenaming(true); }}
-                aria-label="Rename list"
-                className="transition-opacity duration-150"
-                style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
+        {editable && (
+          <div className="relative ml-3" ref={menuRef}>
+            <button
+              onClick={e => { e.preventDefault(); e.stopPropagation(); setMenuOpen(prev => !prev); }}
+              className="font-mono text-sm px-2 py-0.5 rounded"
+              style={{ color: 'var(--text-muted)', background: 'transparent' }}
+              aria-label="List options"
+            >
+              ...
+            </button>
+            {menuOpen && (
+              <div
+                className="absolute right-0 top-full mt-1 z-50 rounded-lg shadow-lg font-mono text-sm overflow-hidden"
+                style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-accent)',
+                  minWidth: '130px',
+                }}
               >
-                <PencilIcon />
-              </button>
-            )}
-            {onDelete && (
-              <button
-                onClick={e => { e.preventDefault(); e.stopPropagation(); onDelete(); }}
-                aria-label="Delete list"
-                className="transition-opacity duration-150"
-                style={{ opacity: hovered ? 1 : 0, color: 'var(--text-muted)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--danger)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
-              >
-                <TrashIcon />
-              </button>
+                <button
+                  className="flex items-center gap-2 text-left w-full px-4 py-2 transition-colors duration-100"
+                  style={{ color: 'var(--text-primary)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); onRenameClick?.(); setMenuOpen(false); }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Rename
+                </button>
+                <button
+                  className="flex items-center gap-2 text-left w-full px-4 py-2 transition-colors duration-100"
+                  style={{ color: 'var(--danger)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  onClick={e => { e.preventDefault(); e.stopPropagation(); onDelete?.(); setMenuOpen(false); }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/>
+                    <path d="M14 11v6"/>
+                    <path d="M5 6V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                  Delete
+                </button>
+              </div>
             )}
           </div>
         )}
       </div>
-      {renameError && (
-        <p className="font-mono text-xs mt-2" style={{ color: 'var(--danger)' }}>
-          {renameError}
-        </p>
-      )}
     </>
   );
 
@@ -163,7 +111,7 @@ function ListRow({ name, wordCount, href, editable = true, onRename, onDelete }:
     border: `1px solid ${hovered ? 'var(--border-accent)' : 'var(--border)'}`,
   };
 
-  if (href && !renaming) {
+  if (href) {
     return (
       <Link
         to={href}
@@ -196,6 +144,7 @@ export default function ListsPage() {
   const [createValue, setCreateValue] = useState('');
   const [createError, setCreateError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [renamingList, setRenamingList] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     fetchLists();
@@ -338,7 +287,7 @@ export default function ListsPage() {
               wordCount={list.wordCount}
               href={`/lists/${list.id}`}
               editable={true}
-              onRename={(name) => renameList(list.id, name)}
+              onRenameClick={() => setRenamingList({ id: list.id, name: list.name })}
               onDelete={() => handleDelete(list.id, list.name)}
             />
           ))}
@@ -348,6 +297,14 @@ export default function ListsPage() {
             </div>
           )}
         </div>
+      )}
+
+      {renamingList && (
+        <RenameListModal
+          currentName={renamingList.name}
+          onRename={(name) => renameList(renamingList.id, name)}
+          onClose={() => setRenamingList(null)}
+        />
       )}
     </div>
   );

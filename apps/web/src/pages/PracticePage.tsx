@@ -15,7 +15,7 @@ export default function PracticePage() {
   }, [fetchLists, reset]);
 
   const activeList = activeListId !== null ? lists.find(l => l.id === activeListId) : null;
-  const noWordsInList = activeListId !== null && activeList !== undefined && activeList.wordCount === 0;
+  const noWordsInList = activeListId !== null && activeList != null && activeList.wordCount === 0;
 
   if (state === 'IDLE') {
     return (

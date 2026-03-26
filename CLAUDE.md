@@ -3,7 +3,7 @@
 ## Architecture
 
 pnpm monorepo with three packages:
-- `packages/shared` (`@vocab/shared`) — Drizzle schema, Zod validators, TypeScript types. **Source of truth** for all data shapes.
+- `packages/shared` (`@vocab/shared`) — Drizzle schema, Zod validators, TypeScript types. **Source of truth** for all data shapes. Has its own `tsc` build step; exports compiled JS from `dist/`.
 - `apps/api` (`@vocab/api`) — Hono + Drizzle ORM + @libsql/client. Serves REST API on port 3000, serves static frontend in production.
 - `apps/web` (`@vocab/web`) — React 18 + Vite + Tailwind CSS. Proxies `/api` to port 3000 in dev.
 
@@ -11,7 +11,7 @@ pnpm monorepo with three packages:
 
 - **@libsql/client over better-sqlite3**: Node.js 22 on this Windows dev machine lacks VS 2019+ required for native compilation. @libsql/client is pure JS/WASM, no build tools needed.
 - **SQLite with Drizzle**: Local file DB (`vocab.db` in repo root). Drizzle migrations are in `apps/api/src/migrations/`.
-- **Schema lives in shared**: `packages/shared/src/schema.ts` is imported by both the API (Drizzle) and drizzle-kit config. Never duplicate types.
+- **Schema lives in shared**: `packages/shared/src/schema.ts` is imported by both the API (Drizzle) and drizzle-kit config. Never duplicate types. `@vocab/shared` has its own `tsc` build step — its `package.json` exports point to `./dist/index.js`. In dev, `tsx` resolves imports directly so no build is needed. In Docker/production, `pnpm --filter @vocab/shared build` must run before the API build.
 - **Gender always shown in practice**: To avoid leaking noun/non-noun status, the gender selector is always visible. If `word.gender` is null, gender input is ignored during evaluation.
 - **Word selection**: In-memory circular buffer (last 5 words) in `selectionService.ts`. Recently practiced words get 0.1× weight. Category weights: New=3, Learning=2, Mastered=1.
 - **Edit word**: `PUT /api/words/:id` updates `hungarian`, `german`, `gender` only — preserves `rating`, `createdAt`, `lastPracticedAt`. Frontend uses `EditWordModal` (pencil icon on hover in `WordCard`).
@@ -41,6 +41,9 @@ npm exec pnpm build
 
 # Start production server via PM2
 pm2 start pm2.config.js
+
+# Build shared package (needed before API build in Docker; not needed for local dev)
+npm exec pnpm -- --filter @vocab/shared build
 ```
 
 ## Running pnpm on Windows

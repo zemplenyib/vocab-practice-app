@@ -35,7 +35,7 @@ export default function ResultDisplay({ result, onNext }: Props) {
           style={{ background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
         >
           {result.correctGender
-            ? <span style={{ color: result.correctGender === 'der' ? 'var(--new)' : result.correctGender === 'die' ? 'var(--danger)' : 'var(--learning)', marginRight: '0.35rem' }}>{result.correctGender}</span>
+            ? <span style={{ color: result.correctGender === 'der' ? 'var(--der)' : result.correctGender === 'die' ? 'var(--die)' : 'var(--das)', marginRight: '0.35rem' }}>{result.correctGender}</span>
             : null}
           {result.correctGerman}
         </div>

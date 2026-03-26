@@ -6,9 +6,9 @@ interface Props {
 }
 
 const genderConfig = [
-  { g: 'der' as const, color: 'var(--new)',      dim: 'var(--new-dim)' },
-  { g: 'die' as const, color: 'var(--danger)',   dim: 'var(--danger-dim)' },
-  { g: 'das' as const, color: 'var(--learning)', dim: 'var(--learning-dim)' },
+  { g: 'der' as const, color: 'var(--der)',  dim: 'var(--der-dim)' },
+  { g: 'die' as const, color: 'var(--die)', dim: 'var(--danger-dim)' },
+  { g: 'das' as const, color: 'var(--das)', dim: 'var(--das-dim)' },
 ];
 
 export default function AnswerInput({ onSubmit, disabled }: Props) {

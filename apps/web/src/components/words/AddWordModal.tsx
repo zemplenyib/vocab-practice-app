@@ -7,9 +7,9 @@ interface Props {
 }
 
 const genderColors: Record<'der' | 'die' | 'das', string> = {
-  der: 'var(--new)',
-  die: 'var(--danger)',
-  das: 'var(--learning)',
+  der: 'var(--der)',
+  die: 'var(--die)',
+  das: 'var(--das)',
 };
 
 export default function AddWordModal({ onAdd, onClose }: Props) {

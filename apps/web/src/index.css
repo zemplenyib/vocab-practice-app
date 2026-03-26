@@ -5,24 +5,29 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0f0e0c;
-  --bg-card: #1a1916;
-  --bg-card-hover: #201f1c;
-  --border: #2e2c28;
-  --border-accent: #3d3a34;
-  --text-primary: #f0ead8;
-  --text-secondary: #8a8070;
-  --text-muted: #4a4540;
-  --gold: #c9a84c;
-  --gold-dim: #7a6530;
-  --new: #5b8dd9;
-  --new-dim: #1e3a6e;
-  --learning: #c9a84c;
-  --learning-dim: #5a4a1e;
-  --mastered: #6bab7c;
-  --mastered-dim: #1e4a2a;
-  --danger: #c95b5b;
-  --danger-dim: #4a1e1e;
+  --bg: #f5f2eb;
+  --bg-card: #fffef9;
+  --bg-card-hover: #f0ece2;
+  --border: #ddd8cc;
+  --border-accent: #c4bdb0;
+  --text-primary: #1c1a16;
+  --text-secondary: #6b6459;
+  --text-muted: #a89f94;
+  --gold: #a07820;
+  --gold-dim: #f0e4c4;
+  --new: #7c4db8;
+  --new-dim: #eddff8;
+  --learning: #2a8a7a;
+  --learning-dim: #d4f0ec;
+  --mastered: #2e8a4a;
+  --mastered-dim: #d4f0dc;
+  --danger: #b83232;
+  --danger-dim: #f8dada;
+  --der: #3a72c4;
+  --der-dim: #dbe8f8;
+  --die: #b83232;
+  --das: #b07d10;
+  --das-dim: #faefd4;
 }
 
 * {
@@ -51,7 +56,7 @@ body::before {
   background-size: 128px 128px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
+  opacity: 0.25;
 }
 
 #root {

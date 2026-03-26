@@ -37,7 +37,7 @@ export default function WordCard({ word, onEdit, onDelete, index = 0 }: Props) {
           {word.hungarian}
         </span>
         <span className="font-mono text-sm" style={{ color: 'var(--text-secondary)' }}>
-          {word.gender ? <span style={{ color: accent, marginRight: '0.25rem' }}>{word.gender}</span> : null}
+          {word.gender ? <span style={{ color: word.gender === 'der' ? 'var(--der)' : word.gender === 'die' ? 'var(--die)' : 'var(--das)', marginRight: '0.25rem' }}>{word.gender}</span> : null}
           {word.german}
         </span>
       </div>

@@ -1,5 +1,5 @@
 # ── Build stage ────────────────────────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ RUN pnpm --filter @vocab/shared build && \
 RUN cp -r apps/web/dist apps/api/public
 
 # ── Runtime stage ───────────────────────────────────────────────────────────────
-FROM node:22-alpine AS runtime
+FROM node:22-slim AS runtime
 
 WORKDIR /app
 

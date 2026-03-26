@@ -57,4 +57,6 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["node", "apps/api/dist/index.js"]
+# Run from apps/api so relative paths (./public, migrations) resolve correctly
+WORKDIR /app/apps/api
+CMD ["node", "dist/index.js"]
